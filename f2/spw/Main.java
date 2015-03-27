@@ -9,6 +9,7 @@ public class Main {
 		JFrame frame = new JFrame("Space War");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(400, 650);
+		frame.setResizable(false);
 		frame.getContentPane().setLayout(new BorderLayout());
 		
 		SpaceShip v = new SpaceShip(180, 550, 20, 20);
