@@ -7,6 +7,9 @@ import java.awt.event.KeyListener;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.awt.Graphics2D;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
 
 import javax.swing.Timer;
 
@@ -15,7 +18,8 @@ public class GameEngine implements KeyListener, GameReporter{
 	GamePanel gp;
 		
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();	
-	private SpaceShip v;	
+	private SpaceShip v;
+	private boolean gameOver = false;
 	
 	private Timer timer;
 	
@@ -73,6 +77,7 @@ public class GameEngine implements KeyListener, GameReporter{
 			er = e.getRectangle();
 			if(er.intersects(vr)){
 				die();
+				e.setAlive(false);
 				return;
 			}
 		}
@@ -80,6 +85,14 @@ public class GameEngine implements KeyListener, GameReporter{
 	
 	public void die(){
 		timer.stop();
+		gameOver = true;
+		gp.updateGameUI(this,0);
+	}
+	
+	private void continueGame(){
+		gameOver = false;
+		gp.updateGameUI(this);
+		timer.start();
 	}
 	
 	void controlVehicle(KeyEvent e) {
@@ -108,7 +121,13 @@ public class GameEngine implements KeyListener, GameReporter{
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
-		controlVehicle(e);
+		if(timer.isRunning())
+			controlVehicle(e);
+		else if(e.getKeyCode() == KeyEvent.VK_ENTER){
+			if(gameOver){				
+				continueGame();
+			}
+		}
 	}
 
 	@Override
