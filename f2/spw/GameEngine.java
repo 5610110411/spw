@@ -20,11 +20,13 @@ public class GameEngine implements KeyListener, GameReporter{
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();	
 	private SpaceShip v;
 	private boolean gameOver = false;
+	private boolean pauseGame = false;
 	
 	private Timer timer;
 	
 	private long score = 0;
 	private double difficulty = 0.1;
+	
 	
 	public GameEngine(GamePanel gp, SpaceShip v) {
 		this.gp = gp;
@@ -91,28 +93,37 @@ public class GameEngine implements KeyListener, GameReporter{
 	
 	private void continueGame(){
 		gameOver = false;
+		timer.start();
 		gp.updateGameUI(this);
+	}
+	
+	private void pauseGame(){
+		pauseGame = true;
+		timer.stop();
+		gp.updateGameUI(this,2);
+	}
+	
+	private void resumeGame(){
+		pauseGame = false;
 		timer.start();
 	}
 	
-	void controlVehicle(KeyEvent e) {
-		switch (e.getKeyCode()) {
-		case KeyEvent.VK_LEFT:
+	void controlVehicle(KeyEvent e) {							//You can move ship indiraction x axis & y axis
+		int key = e.getKeyCode();
+		if(key == KeyEvent.VK_LEFT){
 			v.moveX(-1);
-			break;
-		case KeyEvent.VK_RIGHT:
+		}else if(key == KeyEvent.VK_RIGHT){
 			v.moveX(1);
-			break;
-		case KeyEvent.VK_UP:
-			v.moveY(-1);
-			break;
-		case KeyEvent.VK_DOWN:
+		}else if(key == KeyEvent.VK_DOWN){
 			v.moveY(1);
-			break;
-		case KeyEvent.VK_D:
+		}else if(key == KeyEvent.VK_UP){
+			v.moveY(-1);
+		}else if(key == KeyEvent.VK_ENTER && pauseGame == false){
+			pauseGame();
+		}else if(key == KeyEvent.VK_D){
 			difficulty += 0.1;
-			break;
 		}
+		
 	}
 
 	public long getScore(){
@@ -126,6 +137,9 @@ public class GameEngine implements KeyListener, GameReporter{
 		else if(e.getKeyCode() == KeyEvent.VK_ENTER){
 			if(gameOver){				
 				continueGame();
+			}
+			else if(pauseGame){				
+				resumeGame();
 			}
 		}
 	}

@@ -33,21 +33,19 @@ public class GamePanel extends JPanel {
 	}
 	
 	public void updateGameUI(GameReporter reporter,int state){
-		big.clearRect(0, 0, 400, 650);
-		
-		Background();
-		
 		switch (state){
 			case 0:	gameOver(reporter);
 				break;
 			case 1:	gameOn(reporter);
+				break;
+			case 2:	gamePause(reporter);
 				break;
 		}
 		repaint();
 	}
 
 	public void gameOn(GameReporter reporter){
-		
+		Background();
 		big.setColor(Color.WHITE);
 		big.setFont(new Font("TimesRoman", Font.PLAIN, 16));
 		big.drawString(String.format("%08d", reporter.getScore()), 300, 40); 
@@ -65,6 +63,15 @@ public class GamePanel extends JPanel {
 		big.setColor(Color.white);
 		big.setFont(new Font("TimesRoman", Font.PLAIN, 20));
 		big.drawString("Press [ENTER] to Try again", 80, 320);
+	}
+	
+	public void gamePause(GameReporter reporter){  
+		big.setColor(Color.yellow);
+		big.setFont(new Font("TimesRoman", Font.PLAIN, 30));
+		big.drawString("Game Paused", 100, 280);
+		big.setColor(Color.white);
+		big.setFont(new Font("TimesRoman", Font.PLAIN, 20));
+		big.drawString("Press [ENTER] to Resume Game", 50, 320);
 	}
 	
 	public void Background(){		
