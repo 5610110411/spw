@@ -13,10 +13,13 @@ public abstract class Sprite {
 	int height;
 	private BufferedImage sheetP = null;
 	private BufferedImage sheetF = null;
+	private BufferedImage sheetB = null;
 	private SpriteSheet ssp;
 	private SpriteSheet ssf;
+	private SpriteSheet ssb;
 	BufferedImage player;
 	BufferedImage foe;
+	BufferedImage bullet;
 	
 	public Sprite(int x, int y, int width, int height) {
 		this.x = x;
@@ -29,6 +32,7 @@ public abstract class Sprite {
 		try{
 			sheetP = loader.loadImage("/f2/spw/Pictures/ship.png");
 			sheetF = loader.loadImage("/f2/spw/Pictures/enemy.png");
+			sheetB = loader.loadImage("/f2/spw/Pictures/bullet.png");
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -37,6 +41,9 @@ public abstract class Sprite {
 		
 		ssf = new SpriteSheet(sheetF);
 		foe = ssf.grabImage(1 , 1, 63, 99);
+		
+		ssb = new SpriteSheet(sheetB);
+		bullet = ssb.grabImage(1 , 1, 19, 49);
 	}
 
 	abstract public void draw(Graphics2D g);

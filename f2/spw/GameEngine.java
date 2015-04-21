@@ -17,7 +17,8 @@ import javax.swing.Timer;
 public class GameEngine implements KeyListener, GameReporter{
 	GamePanel gp;
 		
-	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();	
+	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+private ArrayList<Bullet> bullets1 = new ArrayList<Bullet>();	
 	private SpaceShip v;
 	private boolean gameOver = false;
 	private boolean pauseGame = false;
@@ -54,6 +55,12 @@ public class GameEngine implements KeyListener, GameReporter{
 		enemies.add(e);
 	}
 	
+	private void generateBullet(){
+		Bullet b1 = new Bullet(v.x, v.y, 15, 35);   			//(v.x==bullet from leftgun, v.y, 15, 35);
+		gp.sprites.add(b1);
+		bullets1.add(b1);
+	}
+	
 	private void process(){
 		if(Math.random() < difficulty){
 			generateEnemy();
@@ -71,10 +78,22 @@ public class GameEngine implements KeyListener, GameReporter{
 			}
 		}
 		
+		Iterator<Bullet> b_iter1 = bullets1.iterator();			// Using left-bullet on screen
+		while(b_iter1.hasNext()){
+			Bullet b1 = b_iter1.next();
+			b1.proceed();
+			
+			if(!b1.isAlive()){
+				b_iter1.remove();
+				gp.sprites.remove(b1);
+			}
+		}
+		
 		gp.updateGameUI(this);
 		
 		Rectangle2D.Double vr = v.getRectangle();
 		Rectangle2D.Double er;
+		Rectangle2D.Double br1;
 		for(Enemy e : enemies){
 			er = e.getRectangle();
 			if(er.intersects(vr)){
@@ -82,7 +101,17 @@ public class GameEngine implements KeyListener, GameReporter{
 				e.setAlive(false);
 				return;
 			}
+		
+			for(Bullet b1 : bullets1){						
+					br1 = b1.getRectangle();						
+					if(er.intersects(br1) && e.isAlive()){			
+							e.setAlive(false);						
+							b1.setAlive(false);			
+					}
+				}
+		
 		}
+		
 	}
 	
 	public void die(){
@@ -122,6 +151,8 @@ public class GameEngine implements KeyListener, GameReporter{
 			pauseGame();
 		}else if(key == KeyEvent.VK_D){
 			difficulty += 0.1;
+		}else if(key == KeyEvent.VK_A){
+			generateBullet();
 		}
 		
 	}
