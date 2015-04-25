@@ -18,7 +18,8 @@ public class GameEngine implements KeyListener, GameReporter{
 	GamePanel gp;
 		
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
-private ArrayList<Bullet> bullets1 = new ArrayList<Bullet>();	
+	private ArrayList<Bullet> bullets1 = new ArrayList<Bullet>();
+	private ArrayList<GreenMedicine> GreenMedicines = new ArrayList<GreenMedicine>();
 	private SpaceShip v;
 	private boolean gameOver = false;
 	private boolean pauseGame = false;
@@ -27,6 +28,9 @@ private ArrayList<Bullet> bullets1 = new ArrayList<Bullet>();
 	
 	private long score = 0;
 	private double difficulty = 0.1;
+	private double rateMedicine = 0.01;
+	private double greenMed = 10;
+	private double enemyDamage = 25;
 	
 	
 	public GameEngine(GamePanel gp, SpaceShip v) {
@@ -56,15 +60,28 @@ private ArrayList<Bullet> bullets1 = new ArrayList<Bullet>();
 	}
 	
 	private void generateBullet(){
-		Bullet b1 = new Bullet(v.x, v.y, 15, 35);   			//(v.x==bullet from leftgun, v.y, 15, 35);
+		Bullet b1 = new Bullet(v.x, v.y, 15, 35);  
 		gp.sprites.add(b1);
 		bullets1.add(b1);
+	}
+	
+	private void generateGreenMedicine(){							
+		GreenMedicine gm = new GreenMedicine((int)(Math.random()*390), 30, 20, 34);
+		gp.sprites.add(gm);
+		GreenMedicines.add(gm);
 	}
 	
 	private void process(){
 		if(Math.random() < difficulty){
 			generateEnemy();
 		}
+		
+		if(Math.random() < rateMedicine){					
+			generateGreenMedicine();
+		}
+		
+		if(v.getHealth() < 150)										//HP Recovery
+			v.setHealth(v.getHealth() + 0.01);
 		
 		Iterator<Enemy> e_iter = enemies.iterator();
 		while(e_iter.hasNext()){
@@ -89,16 +106,45 @@ private ArrayList<Bullet> bullets1 = new ArrayList<Bullet>();
 			}
 		}
 		
+		Iterator<GreenMedicine> gm_iter = GreenMedicines.iterator();				
+		while(gm_iter.hasNext()){
+			GreenMedicine gm = gm_iter.next();
+			gm.proceed();
+			
+			if(!gm.isAlive()){ 								
+				gm_iter.remove();								
+				gp.sprites.remove(gm);
+			}
+		}
+		
 		gp.updateGameUI(this);
 		
 		Rectangle2D.Double vr = v.getRectangle();
 		Rectangle2D.Double er;
 		Rectangle2D.Double br1;
-		for(Enemy e : enemies){
-			er = e.getRectangle();
-			if(er.intersects(vr)){
-				die();
-				e.setAlive(false);
+		Rectangle2D.Double gmr;	
+		for(GreenMedicine gm : GreenMedicines){
+			gmr = gm.getRectangle();	
+			if(gmr.intersects(vr)){								
+				if((v.getHealth() + greenMed) < v.getOriginHealth())								
+					v.setHealth(v.getHealth() + greenMed);				
+				if((v.getHealth() + greenMed) >= v.getOriginHealth())								
+					v.setOriginHealth();
+				else	
+					v.setHealth(v.getHealth() + 0);				
+				gm.setAlive(false);								
+			}
+		}
+		
+		
+		
+		for(Enemy e : enemies){									
+			er = e.getRectangle();						     
+			if(er.intersects(vr) && e.isAlive()){				
+				v.setHealth(v.getHealth() - enemyDamage);
+				e.setAlive(false);								
+				if(v.getHealth() <= 0)						
+					die();									
 				return;
 			}
 		
@@ -124,6 +170,7 @@ private ArrayList<Bullet> bullets1 = new ArrayList<Bullet>();
 		gameOver = false;
 		timer.start();
 		gp.updateGameUI(this);
+		v.setOriginHealth();
 	}
 	
 	private void pauseGame(){
@@ -137,7 +184,7 @@ private ArrayList<Bullet> bullets1 = new ArrayList<Bullet>();
 		timer.start();
 	}
 	
-	void controlVehicle(KeyEvent e) {							//You can move ship indiraction x axis & y axis
+	void controlVehicle(KeyEvent e) {							//You can move ship in diraction x axis & y axis
 		int key = e.getKeyCode();
 		if(key == KeyEvent.VK_LEFT){
 			v.moveX(-1);
