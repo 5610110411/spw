@@ -14,14 +14,17 @@ public abstract class Sprite {
 	private BufferedImage sheetP = null;
 	private BufferedImage sheetF = null;
 	private BufferedImage sheetB = null;
+	private BufferedImage sheetM = null;
 	private BufferedImage sheetGm = null;
 	private SpriteSheet ssp;
 	private SpriteSheet ssf;
 	private SpriteSheet ssb;
+	private SpriteSheet ssm;
 	private SpriteSheet ssgm;
 	BufferedImage player;
 	BufferedImage foe;
 	BufferedImage bullet;
+	BufferedImage money;
 	BufferedImage greenMedicine;
 	
 	public Sprite(int x, int y, int width, int height) {
@@ -36,6 +39,7 @@ public abstract class Sprite {
 			sheetP = loader.loadImage("/f2/spw/Pictures/ship.png");
 			sheetF = loader.loadImage("/f2/spw/Pictures/enemy.png");
 			sheetB = loader.loadImage("/f2/spw/Pictures/bullet.png");
+			sheetM = loader.loadImage("/f2/spw/Pictures/money.png");
 			sheetGm = loader.loadImage("/f2/spw/Pictures/green_medicine.png");
 		}catch(IOException e){
 			e.printStackTrace();
@@ -48,6 +52,9 @@ public abstract class Sprite {
 		
 		ssb = new SpriteSheet(sheetB);
 		bullet = ssb.grabImage(1 , 1, 19, 49);
+		
+		ssm = new SpriteSheet(sheetM);
+		money = ssm.grabImage(1 , 1, 39, 36);
 		
 		ssgm = new SpriteSheet(sheetGm);
 		greenMedicine = ssgm.grabImage(1 , 1, 41, 68);

@@ -19,6 +19,7 @@ public class GameEngine implements KeyListener, GameReporter{
 		
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	private ArrayList<Bullet> bullets1 = new ArrayList<Bullet>();
+	private ArrayList<Money> moneys = new ArrayList<Money>();
 	private ArrayList<GreenMedicine> GreenMedicines = new ArrayList<GreenMedicine>();
 	private SpaceShip v;
 	private boolean gameOver = false;
@@ -30,6 +31,7 @@ public class GameEngine implements KeyListener, GameReporter{
 	private double difficulty = 0.1;
 	private double rateMedicine = 0.01;
 	private double greenMed = 10;
+	private double rateMoney = 0.01;
 	private double enemyDamage = 25;
 	
 	
@@ -71,6 +73,12 @@ public class GameEngine implements KeyListener, GameReporter{
 		GreenMedicines.add(gm);
 	}
 	
+	private void generateMoney(){								
+		Money m = new Money((int)(Math.random()*390), 30, 25, 25); 
+		gp.sprites.add(m);
+		moneys.add(m);
+	}
+	
 	private void process(){
 		if(Math.random() < difficulty){
 			generateEnemy();
@@ -78,6 +86,10 @@ public class GameEngine implements KeyListener, GameReporter{
 		
 		if(Math.random() < rateMedicine){					
 			generateGreenMedicine();
+		}
+		
+		if(Math.random() < rateMoney){							
+			generateMoney();
 		}
 		
 		if(v.getHealth() < 150)										//HP Recovery
@@ -91,7 +103,7 @@ public class GameEngine implements KeyListener, GameReporter{
 			if(!e.isAlive()){
 				e_iter.remove();
 				gp.sprites.remove(e);
-				score += 100;
+				//score += 100;
 			}
 		}
 		
@@ -117,11 +129,23 @@ public class GameEngine implements KeyListener, GameReporter{
 			}
 		}
 		
+		Iterator<Money> m_iter = moneys.iterator();				
+		while(m_iter.hasNext()){
+			Money m = m_iter.next();
+			m.proceed();
+			
+			if(!m.isAlive()){ 									
+				m_iter.remove();
+				gp.sprites.remove(m);
+			}
+		}
+		
 		gp.updateGameUI(this);
 		
 		Rectangle2D.Double vr = v.getRectangle();
 		Rectangle2D.Double er;
 		Rectangle2D.Double br1;
+		Rectangle2D.Double mr;
 		Rectangle2D.Double gmr;	
 		for(GreenMedicine gm : GreenMedicines){
 			gmr = gm.getRectangle();	
@@ -136,7 +160,13 @@ public class GameEngine implements KeyListener, GameReporter{
 			}
 		}
 		
-		
+		for(Money m : moneys){									
+			mr = m.getRectangle();								
+			if(mr.intersects(vr)){
+				score += 1000;
+				m.setAlive(false);										
+			}
+		}
 		
 		for(Enemy e : enemies){									
 			er = e.getRectangle();						     
@@ -152,7 +182,8 @@ public class GameEngine implements KeyListener, GameReporter{
 					br1 = b1.getRectangle();						
 					if(er.intersects(br1) && e.isAlive()){			
 							e.setAlive(false);						
-							b1.setAlive(false);			
+							b1.setAlive(false);
+							score += 100;
 					}
 				}
 		
